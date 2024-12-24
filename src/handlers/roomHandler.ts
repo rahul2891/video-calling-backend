@@ -16,7 +16,7 @@ const roomHandler = (socket: Socket) => {
         socket.emit('room-created', {roomId});
         console.log('new room created', roomId);
 
-    }
+    };
 
     const joinedRoom = ({roomId, peerId}: IRoomParams) => {
        if(rooms[roomId]) {
@@ -24,16 +24,20 @@ const roomHandler = (socket: Socket) => {
            rooms[roomId].push(peerId);
            socket.join(roomId);
 
+           socket.on("ready", () => {
+                socket.to(roomId).emit("user-joined", {peerId});
+           });
+
            socket.emit("get-users", {
-            roomId, 
+            roomId,
             participants: rooms[roomId]
            });
        }
-    }
+    };
 
     socket.on('create-room', createRoom);
     socket.on('joined-room', joinedRoom);
 
-}
+};
 
 export default roomHandler;
