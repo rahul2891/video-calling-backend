@@ -32,6 +32,16 @@ const roomHandler = (socket: Socket) => {
             roomId,
             participants: rooms[roomId]
            });
+
+           socket.on('disconnect', () => {
+            console.log('User disconnected', peerId);
+            rooms[roomId] = rooms[roomId].filter(id => id !== peerId);
+            socket.to(roomId).emit("user-left", { peerId });
+            if (rooms[roomId].length === 0) {
+                delete rooms[roomId];
+            }
+        });
+
        }
     };
 
